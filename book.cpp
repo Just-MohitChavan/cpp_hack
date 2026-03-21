@@ -29,27 +29,27 @@ class Book{
             cin>>price;
         }
 
-        int getBookId() const{
+        int getBookId() {
             return id;
         }
 
-        string getBookTitle() const{
+        string getBookTitle() {
             return title;
         }
 
-        string getBookAuthor() const{
+        string getBookAuthor(){
             return author;
         }
 
-        string getBookSubject() const{
+        string getBookSubject() {
             return subject;
         }
 
-        string getBookIsbn() const{
+        string getBookIsbn() {
             return isbn;
         }
 
-        float getBookPrice() const{
+        float getBookPrice() {
             return price;
         }
 

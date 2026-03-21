@@ -25,19 +25,19 @@ class Copy: public Book{
             cin>>status;
         }
 
-        int getCopyId() const{
+        int getCopyId() {
             return id;
         }
 
-        int getBookId() const{
+        int getBookId() {
            return Book::getBookId();
         }
 
-        string getCopyRack() const{
+        string getCopyRack() {
             return rack;
         }
 
-        string getCopyStatus() const{
+        string getCopyStatus(){
             return status;
         }
 };
