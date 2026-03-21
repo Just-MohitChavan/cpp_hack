@@ -24,7 +24,6 @@ void loadBooks(vector<Book*> book)
         string id;
         string author; 
         string title;
-        string author;
         string subject;
         string isbn;
         string price;
@@ -39,8 +38,28 @@ void loadBooks(vector<Book*> book)
     fin.close( ); 
 }
 
+void saveBooks(vector<Book*> book)
+{
+    ofstream fout("book.txt"); 
+    for(int i = 0 ; i < book.size( ) ; i++)
+    {
+        Book *b; 
+        b = book[i]; 
+        fout<<b->getBookId( )<<","<<b->getBookTitle()<<","<<b->getBookAuthor()<<","<<b->getBookSubject()<<","<<b->getBookIsbn()<<","<<b->getBookPrice()<<endl; 
+    }
+    fout.close( ); 
+}
+
 int main(){
     vector<Book*> bookVec;
+    loadBooks(bookVec);
+    for(int i = 0 ; i < bookVec.size( ) ; i++)
+    {
+        Book *b; 
+        b = bookVec[i]; 
+        cout<<b->getBookId( )<<","<<b->getBookTitle()<<","<<b->getBookAuthor()<<","<<b->getBookSubject()<<","<<b->getBookIsbn()<<","<<b->getBookPrice()<<endl; 
+    }
+    saveBooks(bookVec);
 
     return 0;
 }

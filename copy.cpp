@@ -30,7 +30,7 @@ class Copy: public Book{
         }
 
         int getBookId() const{
-            Book::getBookId();
+           return Book::getBookId();
         }
 
         string getCopyRack() const{
