@@ -2,6 +2,7 @@
 using namespace std;
 #include <vector>
 
+
 class Copy{
     int id;
     int book_id;
@@ -118,28 +119,32 @@ class Book{
         }
 
         void addCopy(Copy *copy)
-    {
-        copies.push_back(copy);
-    }
-    vector<Copy *> &getCopies()
-    {
-        return copies;
-    }
+        {
+            copies.push_back(copy);
+        }
+        vector<Copy *> &getCopies()
+        {
+            return copies;
+        }
 };
 
 
 class payment {
 private:
     int paymentId;
+    int member_id;        
     float amount;
     string type;
     time_t transaction_time;
+    time_t nextpayment_duedate;  
 
 public:
-    payment(void) : paymentId(0), amount(0.0), type(""), transaction_time(0) {}
+    payment(void) : paymentId(0), member_id(0), amount(0.0), type(""), transaction_time(0), nextpayment_duedate(0) {}
 
-    payment(int paymentId, float amount, string type, time_t transaction_time)
-        : paymentId(paymentId), amount(amount), type(type), transaction_time(transaction_time) {}
+    payment(int paymentId, int member_id, float amount, string type, 
+            time_t transaction_time, time_t nextpayment_duedate)
+        : paymentId(paymentId), member_id(member_id), amount(amount), type(type),
+          transaction_time(transaction_time), nextpayment_duedate(nextpayment_duedate) {}
         
     void acceptPaymentDetails() {
         cout << "Enter Payment ID: ";
@@ -150,6 +155,16 @@ public:
         cin >> type;
     }
 
+    void setMemberId(int id) { 
+        member_id = id; 
+    }
+    void setPaymentId(int id) { 
+        paymentId = id; 
+    }
+    void setNextPaymentDueDate(time_t date) {        
+        nextpayment_duedate = date; 
+    }
+
     void setAmount(float newAmount) {
         amount = newAmount;
     }
@@ -157,15 +172,32 @@ public:
         return amount;
     }
 
+    int getPaymentId() { 
+        return paymentId; 
+    }
+    int getMemberId() { 
+        return member_id; 
+    }
+    string getType() { 
+        return type; 
+    }
+    time_t getTransactionTime() { 
+        return transaction_time; 
+    }
+    time_t getNextPaymentDueDate() { 
+        return nextpayment_duedate; 
+    }
+
     void processPayment(float payment_amount, string payment_type) {
         amount = payment_amount;
         type = payment_type;
         transaction_time = time(0);
-
+        nextpayment_duedate = transaction_time + (10); 
         cout << "Payment Processed: " << endl;
         cout << "Amount: " << amount << endl;
         cout << "Type: " << type << endl;
         cout << "Transaction Time: " << ctime(&transaction_time);
+        cout << "Next Payment Due: " << ctime(&nextpayment_duedate);
     }
 };
 
@@ -180,11 +212,10 @@ class member{
     bool paid_satatus;
     payment paymentDetails;
 
-
-
     public:
     member ( void ) : memberId(0) , memberName("") , memberemail("") , memberPhone(""),nextpayment_duedate(0) , paid_satatus(false)
     {   }
+
     member (int memberId , string memberName , string memberemail , string memberPhone , time_t nextpayment_duedate , bool paid_satatus) : memberId(memberId) , memberName(memberName) , memberemail(memberemail) , memberPhone(memberPhone) , nextpayment_duedate(nextpayment_duedate) , paid_satatus(paid_satatus)
     {   }
 
@@ -275,16 +306,26 @@ class member{
                       
         }
     }
+
     void validatepayment(float amount, string payment_type) {
         if ( amount >= 100) {
             cout << "Payment successful. You can proceed with issuing the book." << endl;
             paymentDetails.processPayment(amount, payment_type);
+            set_nextpayment_duedate(paymentDetails.getNextPaymentDueDate());
+            paymentDetails.setMemberId(memberId);
+            paymentDetails.setPaymentId(paymentDetails.getPaymentId()+1);
             set_paid_status(true); 
         } else {
             cout << "Payment failed. Please pay the full amount to proceed." << endl;
             set_paid_status(false); 
         }
-        
+    }
+
+    payment getPaymentDetails() {
+        return paymentDetails;
+    }
+    void setPaymentDetails(payment p) {
+        paymentDetails = p;
     }
 };
 

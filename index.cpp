@@ -22,6 +22,7 @@ int menuList(void){
     cout<<"7. Edit Book Details"<<endl;
     cout<<"8. Edit Member Details"<<endl;
     cout<<"9. Display Members"<<endl;
+    cout<<"10. Display Payments"<<endl;
     cout<<"***************************"<<endl;
     cout<<"Enter your choice - ";
     cin>>choice; 
@@ -187,6 +188,48 @@ void loadMembers(vector<member*> &memberVec) {
     fin.close();
 }
 
+void savePayments(vector<member*> &memberVec) {
+    ofstream fout("data_store/payment.txt");
+    int paymentId = 1;
+    for (int i = 0; i < memberVec.size(); i++) {
+        payment p = memberVec[i]->getPaymentDetails(); // see step 4
+        if (p.get_Amount() > 0) {  // only save if a payment was made
+            fout << paymentId << ","
+                 << p.getMemberId() << ","
+                 << p.get_Amount() << ","
+                 << p.getType() << ","
+                 << p.getTransactionTime() << ","
+                 << p.getNextPaymentDueDate() << "\n";
+        }
+    }
+    fout.close();
+}
+
+void loadPayments(vector<member*> &memberVec) {
+    ifstream fin("data_store/payment.txt");
+    string line;
+    while (getline(fin, line)) {
+        stringstream ss(line);
+        string pid, mid, amt, type, ttime, ndate;
+        getline(ss, pid, ',');
+        getline(ss, mid, ',');
+        getline(ss, amt, ',');
+        getline(ss, type, ',');
+        getline(ss, ttime, ',');
+        getline(ss, ndate, ',');
+
+        int memberIndex = searchMemberById(memberVec, stoi(mid));
+        if (memberIndex != -1) {
+            payment p(stoi(pid), stoi(mid), stof(amt), type,
+                      (time_t)stoll(ttime), (time_t)stoll(ndate));
+            memberVec[memberIndex]->setPaymentDetails(p);  // see step 4
+            memberVec[memberIndex]->set_paid_status(true);
+            memberVec[memberIndex]->set_nextpayment_duedate((time_t)stoll(ndate));
+        }
+    }
+    fin.close();
+}
+
 void loadIssueRecords(vector<issueRecord*> &issueRecordVec) {
     ifstream fin("data_store/issue_records.txt");
     string line;
@@ -205,6 +248,36 @@ void loadIssueRecords(vector<issueRecord*> &issueRecordVec) {
                                                   (time_t)stoll(dueDate), stof(fine)));
     }
     fin.close();
+}
+
+void cleanup(vector<Book*> &bookVec, vector<Copy*> &copyVec,
+             vector<member*> &memberVec, vector<issueRecord*> &issueRecordVec)
+{
+    for (int i = 0; i < bookVec.size(); i++) {
+        delete bookVec[i];
+        bookVec[i] = nullptr;
+    }
+    bookVec.clear();
+
+    for (int i = 0; i < copyVec.size(); i++) {
+        delete copyVec[i];
+        copyVec[i] = nullptr;
+    }
+    copyVec.clear();
+
+  
+    for (int i = 0; i < memberVec.size(); i++) {
+        delete memberVec[i];
+        memberVec[i] = nullptr;
+    }
+    memberVec.clear();
+
+    
+    for (int i = 0; i < issueRecordVec.size(); i++) {
+        delete issueRecordVec[i];
+        issueRecordVec[i] = nullptr;
+    }
+    issueRecordVec.clear();
 }
 int main(){
     cout<<"Welcome to Library Management System"<<endl;
@@ -233,7 +306,7 @@ int main(){
     loadCopies(copyVec, bookVec);
     loadMembers(memberVec);
     loadIssueRecords(issueRecordVec);
-
+    loadPayments(memberVec);
 
     while((choice=menuList( ))!=0)
     {
@@ -245,6 +318,7 @@ int main(){
                 Book *book = new Book( );
                 book->input( );
                 bookVec.push_back(new Book(book->getBookId(), book->getBookTitle(), book->getBookAuthor(), book->getBookSubject(), book->getBookIsbn(), book->getBookPrice()));
+
                 cout<<"Enter number of copies for the book: ";
                 cin>>bookCopiesCount;
                 for(int i = 0 ; i < bookCopiesCount ; i++)
@@ -263,10 +337,11 @@ int main(){
 
                 copyVec.push_back(new Copy(copy->getCopyId(), book->getBookId(), copy->getCopyRack(), copy->getCopyStatus()));
                 bookVec.back()->addCopy(copyVec.back());
-                copy=nullptr;
+                delete copy;    
+                copy = nullptr;
                 }
-                book=nullptr;
-                
+                delete book;        
+                book = nullptr;
                 
             }
             break; 
@@ -438,6 +513,31 @@ int main(){
                 }
             }
             break;
+            case 10:
+            {
+                cout << "Displaying Payments:" << endl;
+                bool anyPayment = false;
+                for (int i = 0; i < memberVec.size(); i++) {
+                    payment p = memberVec[i]->getPaymentDetails();
+                    if (p.get_Amount() > 0) {
+                        anyPayment = true;
+                        cout << "-------------------------" << endl;
+                        cout << "Payment ID       : " << p.getPaymentId() << endl;
+                        cout << "Member ID        : " << p.getMemberId() << endl;
+                        cout << "Member Name      : " << memberVec[i]->get_memberName() << endl;
+                        cout << "Amount Paid      : " << p.get_Amount() << endl;
+                        cout << "Payment Type     : " << p.getType() << endl;
+                        time_t t = p.getTransactionTime();
+                        cout << "Transaction Time : " << ctime(&t);
+                        time_t d = p.getNextPaymentDueDate();
+                        cout << "Next Due Date    : " << ctime(&d);
+                    }
+                }
+                if (!anyPayment) {
+                    cout << "No payment records found." << endl;
+                }
+            }
+            break;
             default:
             {
                 cout<<"Invalid choice. Please try again."<<endl;
@@ -463,5 +563,7 @@ int main(){
     saveCopies(copyVec);
     saveMembers(memberVec);
     saveIssueRecords(issueRecordVec);
+    savePayments(memberVec);
+    cleanup(bookVec, copyVec, memberVec, issueRecordVec); 
     return 0;
 }

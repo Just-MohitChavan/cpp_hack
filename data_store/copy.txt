@@ -1,2 +1,2 @@
 1,123,Q,issued
-2,123,W,available
+2,123,A,issued
