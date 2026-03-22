@@ -67,7 +67,6 @@ class Copy: public Book{
         Copy(int id, int book_id, string rack, string status): id(id), book_id(book_id), rack(rack), status(status){}
 
         void input(){
-            Book::input();
             cout<<"Enter id: ";
             cin>>id;
             cout<<"Enter book_id: ";
