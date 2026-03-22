@@ -140,6 +140,7 @@ public:
 
     payment(int paymentId, float amount, string type, time_t transaction_time)
         : paymentId(paymentId), amount(amount), type(type), transaction_time(transaction_time) {}
+        
     void acceptPaymentDetails() {
         cout << "Enter Payment ID: ";
         cin >> paymentId;

@@ -2,8 +2,7 @@
 #include<fstream>
 #include<sstream>
 #include<vector>
-#include"book.cpp"
-#include"copy.cpp"
+#include"masterclass.cpp"
 using namespace std;
 
 void loadCopies(vector<Copy*> copy) 
