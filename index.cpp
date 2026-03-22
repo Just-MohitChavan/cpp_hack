@@ -5,9 +5,6 @@
 #include <ctime>
 #include<vector>
 #include"masterclass.cpp"
-
-//#include"book_load.cpp"
-//#include"copy_load.cpp"
 using namespace std;
 
 
@@ -136,7 +133,79 @@ void saveMembers(vector<member*> memberVec)
     }
     fout.close( ); 
 }
+void loadBooks(vector<Book*> &bookVec) {
+    ifstream fin("data_store/book.txt");
+    string line;
+    while (getline(fin, line)) {
+        stringstream ss(line);
+        string id, title, author, subject, isbn, price;
+        getline(ss, id, ',');
+        getline(ss, title, ',');
+        getline(ss, author, ',');
+        getline(ss, subject, ',');
+        getline(ss, isbn, ',');
+        getline(ss, price, ',');
+        bookVec.push_back(new Book(stoi(id), title, author, subject, isbn, stof(price)));
+    }
+    fin.close();
+}
 
+void loadCopies(vector<Copy*> &copyVec, vector<Book*> &bookVec) {
+    ifstream fin("data_store/copy.txt");
+    string line;
+    while (getline(fin, line)) {
+        stringstream ss(line);
+        string id, bookId, rack, status;
+        getline(ss, id, ',');
+        getline(ss, bookId, ',');
+        getline(ss, rack, ',');
+        getline(ss, status, ',');
+        copyVec.push_back(new Copy(stoi(id), stoi(bookId), rack, status));
+        int bookIndex = searchBookById(bookVec, stoi(bookId));
+        if (bookIndex != -1) {
+            bookVec[bookIndex]->addCopy(copyVec.back());
+        }
+    }
+    fin.close();
+}
+
+void loadMembers(vector<member*> &memberVec) {
+    ifstream fin("data_store/member.txt");
+    string line;
+    while (getline(fin, line)) {
+        stringstream ss(line);
+        string memberId, name, email, phone, duedate, paid;
+        getline(ss, memberId, ',');
+        getline(ss, name, ',');
+        getline(ss, email, ',');
+        getline(ss, phone, ',');
+        getline(ss, duedate, ',');
+        getline(ss, paid, ',');
+        memberVec.push_back(new member(stoi(memberId), name, email, phone, 
+                                       (time_t)stoll(duedate), stoi(paid)));
+    }
+    fin.close();
+}
+
+void loadIssueRecords(vector<issueRecord*> &issueRecordVec) {
+    ifstream fin("data_store/issue_records.txt");
+    string line;
+    while (getline(fin, line)) {
+        stringstream ss(line);
+        string issueId, copyId, memberId, issueDate, returnDate, dueDate, fine;
+        getline(ss, issueId, ',');
+        getline(ss, copyId, ',');
+        getline(ss, memberId, ',');
+        getline(ss, issueDate, ',');
+        getline(ss, returnDate, ',');
+        getline(ss, dueDate, ',');
+        getline(ss, fine, ',');
+        issueRecordVec.push_back(new issueRecord(stoi(issueId), stoi(copyId), stoi(memberId),
+                                                  (time_t)stoll(issueDate), (time_t)stoll(returnDate),
+                                                  (time_t)stoll(dueDate), stof(fine)));
+    }
+    fin.close();
+}
 int main(){
     cout<<"Welcome to Library Management System"<<endl;
     string username;
@@ -159,6 +228,13 @@ int main(){
     int bookCopiesCount = 0;
     vector<Book*> bookVec;
     vector<member*> memberVec;
+    
+    loadBooks(bookVec);
+    loadCopies(copyVec, bookVec);
+    loadMembers(memberVec);
+    loadIssueRecords(issueRecordVec);
+
+
     while((choice=menuList( ))!=0)
     {
      
@@ -274,7 +350,7 @@ int main(){
             case 5:
             {
                 for (int i = 0; i < issueRecordVec.size(); i++) {
-                    cout << "Issue Record " << i + 1 << " :" << endl;
+                    cout << "Issue Record " << issueRecordVec[i]->get_IssueId() << " :" << endl;
                     cout << "  Member ID: " << issueRecordVec[i]->get_MemberId() << endl;
                     cout<< "  Book ID: " << issueRecordVec[i]->Copy::getBookId() << endl;
                     cout << "  Copy ID: " << issueRecordVec[i]->get_CopyId() << endl;
