@@ -1,0 +1,4 @@
+1, 123, rackA, available
+2, 123, rackB, available
+3, 124, rackA, available
+4, 124, rackB, available
