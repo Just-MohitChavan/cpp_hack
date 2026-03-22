@@ -92,10 +92,55 @@ void CheckBookStatus(vector<Book*> bookVec){
     }
 }
 
+
+void saveBooks(vector<Book*> bookVec)
+{
+    ofstream fout("data_store/book.txt"); 
+    for(int i = 0 ; i < bookVec.size( ) ; i++)
+    {
+        fout<<bookVec[i]->getBookId( )<<","<<bookVec[i]->getBookTitle( )<<","<<bookVec[i]->getBookAuthor( )<<","<<bookVec[i]->getBookSubject( )<<","<<bookVec[i]->getBookIsbn( )<<","<<bookVec[i]->getBookPrice( )<<"\n"; 
+    }
+    fout.close( ); 
+}
+
+void saveCopies(vector<Copy*> copyVec)
+{
+    ofstream fout("data_store/copy.txt"); 
+    for(int i = 0 ; i < copyVec.size( ) ; i++)
+    {
+        fout<<copyVec[i]->getCopyId( )<<","<<copyVec[i]->getBookId( )<<","<<copyVec[i]->getCopyRack( )<<","<<copyVec[i]->getCopyStatus( )<<"\n"; 
+    }
+    fout.close( ); 
+}
+
+void saveIssueRecords(vector<issueRecord*> issueRecordVec)
+{
+    ofstream fout("data_store/issue_records.txt"); 
+    for(int i = 0 ; i < issueRecordVec.size( ) ; i++)
+    {
+        fout << issueRecordVec[i]->get_IssueId() << "," << 
+        issueRecordVec[i]->get_CopyId() << "," << issueRecordVec[i]->get_MemberId() << "," <<
+        issueRecordVec[i]->get_IssueDate() << "," <<
+        issueRecordVec[i]->get_ReturnDate() << "," << issueRecordVec[i]->get_ReturnDueDate() << "," <<
+        issueRecordVec[i]->get_FineAmount() << "\n";
+    }
+    fout.close( ); 
+}
+
+void saveMembers(vector<member*> memberVec)
+{
+    ofstream fout("data_store/member.txt"); 
+    for(int i = 0 ; i < memberVec.size( ) ; i++)
+    {
+        fout<<memberVec[i]->get_memberId( )<<","<<memberVec[i]->get_memberName( )<<","<<memberVec[i]->get_memberemail( )<<","<<memberVec[i]->get_memberPhone( )<<","<<memberVec[i]->get_nextpayment_duedate( )<<","<<memberVec[i]->get_paid_status( )<<"\n"; 
+    }
+    fout.close( ); 
+}
+
 int main(){
     cout<<"Welcome to Library Management System"<<endl;
-     string username;
-     string password;
+    string username;
+    string password;
     cout<<"Enter useranme : ";
    
     cin>>username;
@@ -208,13 +253,13 @@ int main(){
                         if (copies[i]->getCopyStatus() == "available") {
                             copyIndex = i;
                             issueRecord *issue = new issueRecord();
+                            issue->set_IssueId(issueRecordVec.size() + 1); 
                             issue->set_MemberId(memberId);
                             issue->set_CopyId(copies[i]->getCopyId());
                             issue->Copy::setBookId(bookId);
                             issue->issueBook();
                             issueRecordVec.push_back(issue);
-                            copies[i]->setCopyStatus("issued"); // Update copy status to issued
-                            //issue->checkPaymentStatus();
+                            copies[i]->setCopyStatus("issued"); 
                             break;
                         }
                     }
@@ -248,12 +293,11 @@ int main(){
                 cin >> copyId;
 
                 int memberIndex = searchMemberById(memberVec, memberId);
-                //int bookIndex = searchBookById(bookVec, bookId);
-                int copyIndex = searchIssueRecord(issueRecordVec, memberId, copyId); // We can ignore bookId here as we are searching by copyId in issue records
+               
+                int copyIndex = searchIssueRecord(issueRecordVec, memberId, copyId); 
                 if (memberIndex != -1 && copyIndex != -1) {
                     issueRecordVec[copyIndex]->returnBook();
                     int bookId = issueRecordVec[copyIndex]->Copy::getBookId();
-                    // Update the copy status to available
                     for (int i = 0; i < bookVec.size(); i++) {
                         if (bookVec[i]->getBookId() == bookId) {
                             vector<Copy *> copies = bookVec[i]->getCopies();
@@ -339,5 +383,9 @@ int main(){
     }
     calculateTotalFine(issueRecordVec);
 
+    saveBooks(bookVec);
+    saveCopies(copyVec);
+    saveMembers(memberVec);
+    saveIssueRecords(issueRecordVec);
     return 0;
 }

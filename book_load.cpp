@@ -2,7 +2,7 @@
 #include<fstream>
 #include<sstream>
 #include<vector>
-#include"masterclass.cpp"
+//#include"masterclass.cpp"
 using namespace std;
 
 
@@ -30,14 +30,12 @@ void loadBooks(vector<Book*> &book)
     fin.close( ); 
 }
 
-void saveBooks(vector<Book*> &book)
+void saveBooks(vector<Book*> bookVec)
 {
     ofstream fout("data_store/book.txt"); 
-    for(int i = 0 ; i < book.size( ) ; i++)
+    for(int i = 0 ; i < bookVec.size( ) ; i++)
     {
-        Book *b; 
-        b = book[i]; 
-        fout<<b->getBookId( )<<","<<b->getBookTitle()<<","<<b->getBookAuthor()<<","<<b->getBookSubject()<<","<<b->getBookIsbn()<<","<<b->getBookPrice()<<endl; 
+        fout<<bookVec[i]->getBookId( )<<","<<bookVec[i]->getBookAuthor( )<<","<<bookVec[i]->getBookTitle( )<<","<<bookVec[i]->getBookSubject( )<<","<<bookVec[i]->getBookIsbn( )<<","<<bookVec[i]->getBookPrice( )<<"\n"; 
     }
     fout.close( ); 
 }

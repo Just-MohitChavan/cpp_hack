@@ -183,7 +183,7 @@ class member{
 
 
     public:
-    member ( void ) : memberId(0) , memberName("") , memberemail("") , memberPhone("") , paid_satatus(false)
+    member ( void ) : memberId(0) , memberName("") , memberemail("") , memberPhone(""),nextpayment_duedate(0) , paid_satatus(false)
     {   }
     member (int memberId , string memberName , string memberemail , string memberPhone , time_t nextpayment_duedate , bool paid_satatus) : memberId(memberId) , memberName(memberName) , memberemail(memberemail) , memberPhone(memberPhone) , nextpayment_duedate(nextpayment_duedate) , paid_satatus(paid_satatus)
     {   }
@@ -198,6 +198,11 @@ class member{
         nextpayment_duedate = due_date;
     }
 
+    time_t get_nextpayment_duedate()
+    {
+        return nextpayment_duedate;
+    }
+
     bool get_paid_status()
     {
         return paid_satatus;
@@ -206,7 +211,22 @@ class member{
     {
         return memberId;
     }
-    
+
+    string get_memberName()
+    {
+        return memberName;
+    }
+
+    string get_memberemail()
+    {
+        return memberemail;
+    }
+
+    string get_memberPhone()
+    {
+        return memberPhone;
+    }
+
     void acceptMemberDetails()
     {
         cout<<"Enter Member Id : "; 
@@ -284,15 +304,21 @@ public:
         : issueId(0), issueDate(0), return_date(0),
           return_duedate(0), fine_ammount(0.0), memberId(0), copyId(0) {}
 
-    issueRecord(int issueId, time_t issueDate, time_t return_date,
+    issueRecord(int issueId, int copyId,int memberId,  time_t issueDate, time_t return_date,
                 time_t return_duedate, float fine_ammount)
         : issueId(issueId), issueDate(issueDate),
           return_date(return_date),
           return_duedate(return_duedate),
-          fine_ammount(fine_ammount), memberId(0), copyId(0) {}
+          fine_ammount(fine_ammount), memberId(memberId), copyId(copyId) {}
 
     void set_MemberId(int id) {
         memberId = id;
+    }
+    void set_IssueId(int id) {
+        issueId = id;
+    }
+    int get_IssueId() {
+        return issueId;
     }
     void set_CopyId(int id) {
         copyId = id;
@@ -306,6 +332,15 @@ public:
     float get_FineAmount() {
         return fine_ammount;
     }
+    time_t get_ReturnDueDate() {
+        return return_duedate;
+    }
+    time_t get_ReturnDate() {
+        return return_date;
+    }
+    time_t get_IssueDate() {
+        return issueDate;
+    }
     void issueBook() {
 
         
@@ -318,7 +353,7 @@ public:
 
     }
 
-    // sets return date + fine
+    
     void returnBook() {
 
         return_date = time(0);
@@ -333,6 +368,14 @@ public:
         }
 
         cout << "Fine Amount: " << fine_ammount << endl;
+
+
+    }
+
+    void logIssueDetails() {
+        ofstream fout("data_store/issue_records.txt", ios::app);
+        fout << issueId << "," << memberId << "," << copyId << "," << issueDate << "," << return_duedate << "," << return_date << "," << fine_ammount << "\n";
+        fout.close();          
     }
 
 
